@@ -8,49 +8,39 @@ import tryConnect from './lib/start';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
 import './css/app.css';
+
 import App from "./app";
+import Loading from "./components/Loading";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-async function Render() {
-    let loadPage = "login";
+root.render(React.createElement(Loading));
+
+async function Run()
+{
     const value = await tryConnect();
+
+    let loadPage = "login";
+
     if (value) {
         loadPage = "main";
     }
 
-    const renderLogin = () => {
-        const loginElement = React.createElement(Login, null);
-        root.render(React.createElement(React.StrictMode, null, loginElement),
-        );
-    }
-    const renderMain = (value: any) => {
-        const mainElement = React.createElement(Games, value);
-        root.render(React.createElement(React.StrictMode, null, mainElement),
-        );
-    }
-
     switch (loadPage) {
         case "login":
-            setOnSuccessfulLogin(Render);
-            renderLogin();
+            setOnSuccessfulLogin(Run);
+            root.render(App({"connected": false}));
             break;
 
-        // @ts-ignore
         case "main":
-            renderMain(value);
+            root.render(App({"connected": true, "games": value}));
             break;
     }
 }
 
-// @ts-ignore
-if (end === "frontend")
-    root.render(App());
-else
-    Render();
-
-
+Run();
 console.log('👋 This message is being logged by "renderer.js", included via webpack');
 
 
